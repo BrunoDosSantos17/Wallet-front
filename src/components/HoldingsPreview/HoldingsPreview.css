@@ -1,0 +1,87 @@
+.holdings-preview {
+  padding: 24px;
+}
+.holdings-preview header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.holdings-preview header button {
+  background: none;
+  border: 0;
+  color: #318657;
+  cursor: pointer;
+  font: 700 12px inherit;
+}
+.holdings-preview__table {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+}
+.holdings-preview__table button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  color: #173326;
+  cursor: pointer;
+  display: grid;
+  font: 12px inherit;
+  gap: 14px;
+  grid-template-columns: 10px 160px 1fr 1fr auto;
+  padding: 8px;
+  text-align: left;
+}
+.holdings-preview__table button:hover,
+.holdings-preview__row--selected {
+  background: #edf5ef;
+}
+.holdings-preview__table i {
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+.holdings-preview__table span {
+  color: #6b7d72;
+}
+.holdings-preview__table b {
+  font-family: Georgia, serif;
+}
+.holdings-preview__toggle {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #dce5de;
+  color: #318657;
+  cursor: pointer;
+  display: flex;
+  font: 700 12px inherit;
+  justify-content: center;
+  margin-top: 10px;
+  padding: 12px 0 0;
+  width: 100%;
+}
+.holdings-preview__toggle span {
+  font-size: 17px;
+  line-height: 12px;
+  margin-left: 8px;
+}
+@media (max-width: 640px) {
+  .holdings-preview {
+    padding: 18px;
+  }
+  .holdings-preview__table button {
+    gap: 8px;
+    grid-template-columns: 10px 1fr auto;
+  }
+  .holdings-preview__table button span:nth-of-type(1) {
+    display: none;
+  }
+  .holdings-preview__table button span:nth-of-type(2) {
+    text-align: right;
+  }
+  .holdings-preview header {
+    align-items: start;
+    gap: 16px;
+  }
+}

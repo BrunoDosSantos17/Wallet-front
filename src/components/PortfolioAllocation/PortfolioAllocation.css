@@ -1,0 +1,124 @@
+.card {
+  background: #fff;
+  border: 1px solid #dce5de;
+  border-radius: 14px;
+}
+.allocation {
+  min-height: 370px;
+  padding: 22px 24px;
+}
+.allocation h2,
+.recent-activity h2,
+.holdings-preview h2 {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  margin: 0;
+}
+.allocation > div > p {
+  color: #6b7d72;
+  font-size: 12px;
+  margin: 8px 0 0;
+}
+.allocation__content {
+  align-items: center;
+  display: flex;
+  gap: 46px;
+  justify-content: flex-start;
+  margin-top: 30px;
+  padding-left: 10px;
+}
+.allocation__chart {
+  align-items: center;
+  border-radius: 50%;
+  display: flex;
+  height: 228px;
+  justify-content: center;
+  position: relative;
+  width: 228px;
+}
+.allocation__chart::after {
+  background: #fff;
+  border-radius: 50%;
+  content: '';
+  height: 142px;
+  position: absolute;
+  width: 142px;
+}
+.allocation__chart div {
+  display: grid;
+  gap: 4px;
+  position: relative;
+  text-align: center;
+  z-index: 1;
+}
+.allocation__chart strong {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 18px;
+}
+.allocation__chart span {
+  color: #6b7d72;
+  font-size: 11px;
+}
+.allocation__legend {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 360px);
+}
+.allocation__item {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 10px minmax(0, 1fr) 48px;
+  padding: 7px;
+  text-align: left;
+}
+.allocation__item:hover,
+.allocation__item--selected {
+  background: #edf5ef;
+}
+.allocation__item i {
+  border-radius: 50%;
+  height: 10px;
+  width: 10px;
+}
+.allocation__item span {
+  display: grid;
+  gap: 3px;
+}
+.allocation__item strong,
+.allocation__item b {
+  color: #173326;
+  font-size: 13px;
+}
+.allocation__item small {
+  color: #6b7d72;
+  font-size: 11px;
+}
+.allocation__item b {
+  font-family: Georgia, serif;
+  text-align: right;
+}
+@media (max-width: 1050px) {
+  .allocation__content {
+    gap: 24px;
+  }
+}
+@media (max-width: 640px) {
+  .allocation__content {
+    align-items: start;
+    flex-direction: column;
+    margin-top: 20px;
+  }
+  .allocation__chart {
+    align-self: center;
+  }
+  .allocation {
+    min-height: auto;
+  }
+}

@@ -1,0 +1,19 @@
+.page-header {
+  margin-bottom: 30px;
+}
+.page-header span {
+  color: #6b7d72;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+}
+.page-header h1 {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 32px;
+  margin: 10px 0 6px;
+}
+.page-header p {
+  color: #6b7d72;
+  font-size: 14px;
+  margin: 0;
+}
