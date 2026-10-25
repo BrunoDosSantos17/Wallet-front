@@ -12,9 +12,10 @@ function App() {
   const [activeItem, setActiveItem] = useState('Visão geral');
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const [selectedClass, setSelectedClass] = useState<AssetClass | null>(null);
+  const [isDarkTheme, setIsDarkTheme] = useState(false);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${isDarkTheme ? 'app-shell--dark' : ''}`}>
       <Sidebar
         activeItem={activeItem}
         isExpanded={isSidebarExpanded}
@@ -22,7 +23,10 @@ function App() {
         onToggle={() => setIsSidebarExpanded(expanded => !expanded)}
       />
       <main className="dashboard">
-        <PageHeader />
+        <PageHeader
+          isDarkTheme={isDarkTheme}
+          onThemeToggle={() => setIsDarkTheme(isDark => !isDark)}
+        />
         <SummaryStrip />
         <div className="dashboard__top">
           <PortfolioAllocation

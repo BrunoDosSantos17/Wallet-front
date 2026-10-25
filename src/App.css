@@ -2,6 +2,10 @@
   background: #eff4ef;
   display: flex;
   min-height: 100vh;
+  transition: background 0.2s ease;
+}
+.app-shell--dark {
+  background: #0f1713;
 }
 .dashboard {
   flex: 1;

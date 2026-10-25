@@ -47,3 +47,16 @@
     border-top: 1px solid #dce5de;
   }
 }
+.app-shell--dark .summary-strip {
+  background: #17231d;
+  border-color: #2e4538;
+}
+.app-shell--dark .summary-strip__metric + .summary-strip__metric {
+  border-color: #2e4538;
+}
+.app-shell--dark .summary-strip__metric span {
+  color: #9ab0a2;
+}
+.app-shell--dark .summary-strip__metric strong {
+  color: #f4faf6;
+}

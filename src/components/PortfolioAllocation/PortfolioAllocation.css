@@ -122,3 +122,27 @@
     min-height: auto;
   }
 }
+.app-shell--dark .card {
+  background: #17231d;
+  border-color: #2e4538;
+}
+.app-shell--dark .allocation h2,
+.app-shell--dark .recent-activity h2,
+.app-shell--dark .holdings-preview h2,
+.app-shell--dark .allocation__chart strong,
+.app-shell--dark .allocation__item strong,
+.app-shell--dark .allocation__item b {
+  color: #f4faf6;
+}
+.app-shell--dark .allocation > div > p,
+.app-shell--dark .allocation__chart span,
+.app-shell--dark .allocation__item small {
+  color: #9ab0a2;
+}
+.app-shell--dark .allocation__chart::after {
+  background: #17231d;
+}
+.app-shell--dark .allocation__item:hover,
+.app-shell--dark .allocation__item--selected {
+  background: #22382c;
+}

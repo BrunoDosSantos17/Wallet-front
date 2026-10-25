@@ -66,6 +66,20 @@
   line-height: 12px;
   margin-left: 8px;
 }
+.app-shell--dark .holdings-preview__table button {
+  color: #f4faf6;
+}
+.app-shell--dark .holdings-preview__table span {
+  color: #9ab0a2;
+}
+.app-shell--dark .holdings-preview__table button:hover,
+.app-shell--dark .holdings-preview__row--selected {
+  background: #22382c;
+}
+.app-shell--dark .holdings-preview__toggle {
+  border-color: #2e4538;
+  color: #75c896;
+}
 @media (max-width: 640px) {
   .holdings-preview {
     padding: 18px;

@@ -35,3 +35,13 @@
 .transaction--positive {
   color: #318657 !important;
 }
+.app-shell--dark .transaction span,
+.app-shell--dark .transaction strong {
+  color: #f4faf6;
+}
+.app-shell--dark .transaction time {
+  color: #9ab0a2;
+}
+.app-shell--dark .transaction--positive {
+  color: #75c896 !important;
+}

@@ -1,4 +1,7 @@
 .page-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
   margin-bottom: 30px;
 }
 .page-header span {
@@ -16,4 +19,37 @@
   color: #6b7d72;
   font-size: 14px;
   margin: 0;
+}
+.theme-toggle {
+  align-items: center;
+  background: #fff;
+  border: 1px solid #dce5de;
+  border-radius: 10px;
+  color: #173326;
+  cursor: pointer;
+  display: flex;
+  height: 38px;
+  justify-content: center;
+  width: 38px;
+}
+.theme-toggle svg {
+  fill: none;
+  height: 18px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  width: 18px;
+}
+.app-shell--dark .page-header span,
+.app-shell--dark .page-header p {
+  color: #9ab0a2;
+}
+.app-shell--dark .page-header h1 {
+  color: #f4faf6;
+}
+.app-shell--dark .theme-toggle {
+  background: #17231d;
+  border-color: #2e4538;
+  color: #b9e7c9;
 }
