@@ -1,15 +1,16 @@
 import { useState } from 'react';
-import { allocations } from '../../data/dashboard';
-import type { AssetClass } from '../../types/portfolio';
+import type { Allocation, AssetClass } from '../../types/portfolio';
 import { formatCurrency } from '../../utils/formatters';
 import './HoldingsPreview.css';
 
 interface HoldingsPreviewProps {
+  allocations: Allocation[];
   selectedClass: AssetClass | null;
   onSelect: (assetClass: AssetClass) => void;
 }
 
 export function HoldingsPreview({
+  allocations,
   selectedClass,
   onSelect,
 }: HoldingsPreviewProps) {

@@ -1,16 +1,19 @@
-import { allocations } from '../../data/dashboard';
-import type { AssetClass } from '../../types/portfolio';
+import type { Allocation, AssetClass } from '../../types/portfolio';
 import { formatCurrency } from '../../utils/formatters';
 import './PortfolioAllocation.css';
 
 interface PortfolioAllocationProps {
+  allocations: Allocation[];
   selectedClass: AssetClass | null;
   onSelect: (assetClass: AssetClass) => void;
+  totalAmount: number;
 }
 
 export function PortfolioAllocation({
+  allocations,
   selectedClass,
   onSelect,
+  totalAmount,
 }: PortfolioAllocationProps) {
   const gradient = `conic-gradient(${allocations
     .map((item, index) => {
@@ -29,7 +32,7 @@ export function PortfolioAllocation({
       <div className="allocation__content">
         <div className="allocation__chart" style={{ background: gradient }}>
           <div>
-            <strong>R$ 248,6k</strong>
+            <strong>{formatCurrency(totalAmount)}</strong>
             <span>investidos</span>
           </div>
         </div>

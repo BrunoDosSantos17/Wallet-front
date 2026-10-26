@@ -58,6 +58,20 @@ export function Sidebar({
           </button>
         ))}
       </nav>
+      <button
+        aria-label="Importação: importar movimentações"
+        className={`sidebar__import ${activeItem === 'Importação' ? 'sidebar__import--active' : ''}`}
+        onClick={() => onNavigate('Importação')}
+        type="button"
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M12 16V3M7 8l5-5 5 5M5 21h14" />
+        </svg>
+        <span className="sidebar__import-copy">
+          <strong>Importação</strong>
+          <small>Importar movimentações</small>
+        </span>
+      </button>
       <div className="sidebar__spacer" />
       <section className="sidebar__help">
         <strong>Próximo passo</strong>

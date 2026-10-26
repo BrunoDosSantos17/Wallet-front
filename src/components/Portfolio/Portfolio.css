@@ -1,0 +1,239 @@
+.portfolio {
+  padding-top: 2px;
+}
+.portfolio__back {
+  background: transparent;
+  border: 0;
+  color: #318657;
+  cursor: pointer;
+  font: 700 12px inherit;
+  padding: 0;
+}
+.portfolio__back span {
+  font-size: 16px;
+  margin-right: 6px;
+}
+.portfolio__heading {
+  margin: 30px 0 34px;
+}
+.portfolio__heading h1 {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 32px;
+  margin: 0 0 8px;
+}
+.portfolio__heading p {
+  color: #6b7d72;
+  font-size: 14px;
+  margin: 0;
+}
+.portfolio__summary {
+  background: #fff;
+  border: 1px solid #dce5de;
+  border-radius: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  overflow: hidden;
+}
+.portfolio__summary article {
+  display: grid;
+  gap: 8px;
+  min-height: 174px;
+  padding: 24px;
+}
+.portfolio__summary article + article {
+  border-left: 1px solid #dce5de;
+}
+.portfolio__summary span {
+  color: #6b7d72;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+.portfolio__summary strong {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 26px;
+}
+.portfolio__summary small {
+  color: #6b7d72;
+  font-size: 12px;
+}
+.portfolio__summary .portfolio__positive {
+  color: #318657;
+}
+.portfolio__assets {
+  margin-top: 32px;
+  padding: 24px;
+}
+.portfolio__assets header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.portfolio__assets h2 {
+  color: #173326;
+  font-family: Georgia, serif;
+  font-size: 18px;
+  margin: 0;
+}
+.portfolio__assets header span,
+.portfolio__assets > p {
+  color: #6b7d72;
+  font-size: 12px;
+  margin: 0;
+}
+.portfolio__assets header i {
+  font-size: 15px;
+  font-style: normal;
+}
+.portfolio__assets > p {
+  margin-top: 16px;
+}
+.portfolio__asset-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+.portfolio__asset {
+  align-items: center;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 42px 210px minmax(80px, 1fr) 120px 54px;
+}
+.portfolio__asset--interactive {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+.portfolio__asset--interactive:hover {
+  background: #f1f6f2;
+  border-radius: 8px;
+}
+.portfolio__badge {
+  align-items: center;
+  background: #e8f1eb;
+  border-radius: 10px;
+  color: #2d8a5b;
+  display: flex;
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+.portfolio__asset-meta {
+  display: grid;
+  gap: 3px;
+}
+.portfolio__asset-meta strong,
+.portfolio__amount {
+  color: #173326;
+  font-size: 13px;
+}
+.portfolio__asset-meta small,
+.portfolio__percentage {
+  color: #6b7d72;
+  font-size: 11px;
+}
+.portfolio__progress {
+  background: #e8efea;
+  border-radius: 8px;
+  height: 8px;
+  overflow: hidden;
+}
+.portfolio__progress i {
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+}
+.portfolio__asset--total .portfolio__badge {
+  font-size: 10px;
+}
+.portfolio__asset--total .portfolio__progress i {
+  background: #2d8a5b;
+  width: 100%;
+}
+.portfolio__amount,
+.portfolio__percentage {
+  font-family: monospace;
+  text-align: right;
+}
+@media (max-width: 820px) {
+  .portfolio__summary {
+    grid-template-columns: 1fr;
+  }
+  .portfolio__summary article {
+    min-height: auto;
+  }
+  .portfolio__summary article + article {
+    border-left: 0;
+    border-top: 1px solid #dce5de;
+  }
+  .portfolio__asset {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+  }
+  .portfolio__progress {
+    grid-column: 2 / -1;
+  }
+  .portfolio__amount {
+    grid-column: 2;
+    text-align: left;
+  }
+  .portfolio__percentage {
+    grid-column: 3;
+    grid-row: 2;
+  }
+}
+@media (max-width: 520px) {
+  .portfolio__assets {
+    padding: 18px;
+  }
+  .portfolio__assets header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .portfolio__assets header span {
+    text-align: right;
+  }
+}
+.app-shell--dark .portfolio__heading h1,
+.app-shell--dark .portfolio__summary strong,
+.app-shell--dark .portfolio__assets h2,
+.app-shell--dark .portfolio__asset-meta strong,
+.app-shell--dark .portfolio__amount {
+  color: #f4faf6;
+}
+.app-shell--dark .portfolio__heading p,
+.app-shell--dark .portfolio__summary span,
+.app-shell--dark .portfolio__summary small,
+.app-shell--dark .portfolio__assets header span,
+.app-shell--dark .portfolio__assets > p,
+.app-shell--dark .portfolio__asset-meta small,
+.app-shell--dark .portfolio__percentage {
+  color: #9ab0a2;
+}
+.app-shell--dark .portfolio__summary {
+  background: #17231d;
+  border-color: #2e4538;
+}
+.app-shell--dark .portfolio__summary article + article {
+  border-color: #2e4538;
+}
+.app-shell--dark .portfolio__badge {
+  background: #20382b;
+}
+.app-shell--dark .portfolio__progress {
+  background: #294037;
+}
+.app-shell--dark .portfolio__asset--interactive:hover {
+  background: #20382b;
+}
+@media (max-width: 820px) {
+  .app-shell--dark .portfolio__summary article + article {
+    border-color: #2e4538;
+  }
+}

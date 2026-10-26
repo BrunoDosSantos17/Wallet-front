@@ -1,10 +1,36 @@
-import { summaryMetrics } from '../../data/dashboard';
+import type { WalletBasicInfo } from '../../types/portfolio';
+import { formatCurrency } from '../../utils/formatters';
 import './SummaryStrip.css';
 
-export function SummaryStrip() {
+interface SummaryStripProps {
+  walletInfo: WalletBasicInfo;
+}
+
+export function SummaryStrip({ walletInfo }: SummaryStripProps) {
+  const metrics = [
+    {
+      label: 'Patrimônio total',
+      value: formatCurrency(walletInfo.patrimonioTotal),
+      detail: 'Saldo consolidado',
+      tone: 'positive',
+    },
+    {
+      label: 'Renda mensal estimada',
+      value: formatCurrency(walletInfo.rendaMensalEst),
+      detail: 'Estimativa mensal',
+      tone: 'warning',
+    },
+    {
+      label: 'Ativos na carteira',
+      value: String(walletInfo.ativosCarteira),
+      detail: `${walletInfo.distribuicao.length} classes de ativos`,
+      tone: 'info',
+    },
+  ];
+
   return (
     <section className="summary-strip" aria-label="Resumo da carteira">
-      {summaryMetrics.map(metric => (
+      {metrics.map(metric => (
         <article className="summary-strip__metric" key={metric.label}>
           <span>{metric.label}</span>
           <strong>{metric.value}</strong>

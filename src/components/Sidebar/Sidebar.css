@@ -105,6 +105,54 @@
 .sidebar__nav-item--active span {
   color: #b9e7c9;
 }
+.sidebar__import {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 10px;
+  color: #b5c8bc;
+  cursor: pointer;
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  text-align: left;
+  width: 100%;
+}
+.sidebar__import:hover,
+.sidebar__import--active {
+  background: #20382b;
+}
+.sidebar__import svg {
+  fill: none;
+  flex: 0 0 18px;
+  height: 18px;
+  stroke: #8ea799;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  width: 18px;
+}
+.sidebar__import-copy {
+  display: grid;
+  gap: 2px;
+}
+.sidebar__import-copy strong {
+  color: #b5c8bc;
+  font-size: 13px;
+  font-weight: 400;
+}
+.sidebar__import-copy small {
+  color: #8ea799;
+  font-size: 10px;
+}
+.sidebar__import--active svg {
+  stroke: #b9e7c9;
+}
+.sidebar__import--active .sidebar__import-copy strong {
+  color: #fff;
+  font-weight: 700;
+}
 .sidebar__spacer {
   flex: 1;
 }
@@ -142,6 +190,7 @@
 .sidebar--collapsed .sidebar__portfolio-label,
 .sidebar--collapsed .portfolio-switcher span:not(:first-child),
 .sidebar--collapsed .sidebar__nav-label,
+.sidebar--collapsed .sidebar__import-copy,
 .sidebar--collapsed .sidebar__help {
   display: none;
 }
@@ -151,6 +200,10 @@
   padding: 10px;
 }
 .sidebar--collapsed .sidebar__nav-item {
+  justify-content: center;
+  padding: 12px;
+}
+.sidebar--collapsed .sidebar__import {
   justify-content: center;
   padding: 12px;
 }
@@ -172,7 +225,8 @@
     width: 100%;
   }
   .sidebar--collapsed .sidebar__brand-name,
-  .sidebar--collapsed .sidebar__nav-label {
+  .sidebar--collapsed .sidebar__nav-label,
+  .sidebar--collapsed .sidebar__import-copy {
     display: inline;
   }
   .sidebar__portfolio-label,

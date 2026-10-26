@@ -18,6 +18,14 @@
   grid-template-columns: minmax(0, 1.95fr) minmax(320px, 1fr);
   margin: 28px 0;
 }
+.dashboard__status {
+  color: #6b7d72;
+  font-size: 14px;
+  margin: 32px 0;
+}
+.app-shell--dark .dashboard__status {
+  color: #9ab0a2;
+}
 @media (max-width: 960px) {
   .dashboard {
     padding: 28px;
