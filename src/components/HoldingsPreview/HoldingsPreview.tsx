@@ -39,7 +39,11 @@ export function HoldingsPreview({
           >
             <i style={{ background: item.color }} />
             <strong>{item.name}</strong>
-            <span>{item.assetCount} ativos</span>
+            <span>
+              {item.assetCount === null
+                ? 'Ativos não informados'
+                : `${item.assetCount} ativos`}
+            </span>
             <span>{formatCurrency(item.amount)}</span>
             <b>{item.percentage}%</b>
           </button>

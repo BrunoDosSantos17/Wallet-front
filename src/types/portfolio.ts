@@ -5,7 +5,7 @@ export interface Allocation {
   name: string;
   amount: number;
   percentage: number;
-  assetCount: number;
+  assetCount: number | null;
   color: string;
 }
 
@@ -16,11 +16,41 @@ export interface WalletDistribution {
   quantidade: number;
 }
 
+export interface WalletAsset {
+  tipo: string;
+  ticker: string;
+}
+
 export interface WalletBasicInfo {
   patrimonioTotal: number;
   rendaMensalEst: number;
   ativosCarteira: number;
   distribuicao: WalletDistribution[];
+  ativos?: WalletAsset[];
+}
+
+export interface ImportErrorDetail {
+  rowNumber: number;
+  message: string;
+}
+
+export interface ImportResponse {
+  totalRows: number;
+  successCount: number;
+  errorCount: number;
+  errors: ImportErrorDetail[];
+}
+
+export interface WalletResponse {
+  id: number;
+  name: string;
+}
+
+export interface CurrencyQuote {
+  bid: number;
+  code: string;
+  codein: string;
+  name: string;
 }
 
 export interface Transaction {
