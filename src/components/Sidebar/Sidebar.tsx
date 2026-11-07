@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { createWallet, getWallets } from '../../api/wallet';
+import { useState } from 'react';
+import { createWallet } from '../../api/wallet';
 import type { WalletResponse } from '../../types/portfolio';
 import './Sidebar.css';
 
@@ -7,9 +7,14 @@ interface SidebarProps {
   activeItem: string;
   isExpanded: boolean;
   onWalletCreated: (wallet: WalletResponse) => void;
+  onWalletSelected: (wallet: WalletResponse) => void;
+  onRetryWallets: () => void;
+  wallets: WalletResponse[];
+  isLoadingWallets: boolean;
+  walletsError: string | null;
   onNavigate: (item: string) => void;
   onToggle: () => void;
-  walletId: number;
+  walletId: number | null;
   walletName: string;
 }
 
@@ -24,6 +29,11 @@ export function Sidebar({
   activeItem,
   isExpanded,
   onWalletCreated,
+  onWalletSelected,
+  onRetryWallets,
+  wallets,
+  isLoadingWallets,
+  walletsError,
   onNavigate,
   onToggle,
   walletId,
@@ -34,20 +44,12 @@ export function Sidebar({
   const [newWalletName, setNewWalletName] = useState('');
   const [walletError, setWalletError] = useState<string | null>(null);
   const [isSubmittingWallet, setIsSubmittingWallet] = useState(false);
-  const [wallets, setWallets] = useState<WalletResponse[]>([]);
-  const [isLoadingWallets, setIsLoadingWallets] = useState(true);
-
-  useEffect(() => {
-    getWallets()
-      .then(setWallets)
-      .catch(() => setWalletError('Não foi possível carregar as carteiras.'))
-      .finally(() => setIsLoadingWallets(false));
-  }, []);
 
   const activeWalletName =
     wallets.find(wallet => wallet.id === walletId)?.name ?? walletName;
 
   async function handleCreateWallet() {
+    if (isSubmittingWallet) return;
     const name = newWalletName.trim();
 
     if (!name) {
@@ -61,7 +63,6 @@ export function Sidebar({
     try {
       const wallet = await createWallet(name);
       onWalletCreated(wallet);
-      setWallets(currentWallets => [...currentWallets, wallet]);
       setNewWalletName('');
       setIsCreatingWallet(false);
     } catch {
@@ -86,6 +87,18 @@ export function Sidebar({
           <i />
         </span>
       </button>
+      {walletsError && (
+        <div className="sidebar__wallet-status" role="alert">
+          {walletsError}
+          <button
+            type="button"
+            disabled={isLoadingWallets}
+            onClick={onRetryWallets}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
       <p className="sidebar__portfolio-label">
         MINHA CARTEIRA
         <br />
@@ -109,6 +122,7 @@ export function Sidebar({
         <div className="sidebar__wallet-creation">
           <button
             className="sidebar__new-wallet"
+            disabled={isLoadingWallets}
             onClick={() => {
               setIsCreatingWallet(visible => !visible);
               setWalletError(null);
@@ -152,13 +166,16 @@ export function Sidebar({
             </small>
           ) : (
             <div className="sidebar__wallet-list">
+              {wallets.length === 0 && !walletsError && (
+                <small>Nenhuma carteira cadastrada.</small>
+              )}
               {wallets.map(wallet => (
                 <button
                   className={
                     wallet.id === walletId ? 'sidebar__wallet--active' : ''
                   }
                   key={wallet.id}
-                  onClick={() => onWalletCreated(wallet)}
+                  onClick={() => onWalletSelected(wallet)}
                   type="button"
                 >
                   <i aria-hidden="true" />

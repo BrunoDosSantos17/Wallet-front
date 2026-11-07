@@ -42,9 +42,11 @@ export async function getWalletBasicInfo(
 
 export async function refreshWalletBasicInfo(
   walletId: number,
+  signal?: AbortSignal,
 ): Promise<WalletBasicInfo> {
   const response = await fetch(
     `${API_BASE_URL}/wallet/infoBasica/${walletId}/atualizar`,
+    { signal },
   );
 
   if (!response.ok) {
@@ -69,7 +71,7 @@ export async function setAssetPriceScheduler(
 
 interface WalletDetailsResponse {
   assetPositions: Array<{
-    assetType: string;
+    assetType: string | null;
     ticker: string;
   }>;
 }
@@ -89,7 +91,7 @@ export async function getWalletAssets(
   const wallet = (await response.json()) as WalletDetailsResponse;
 
   return wallet.assetPositions.map(position => ({
-    tipo: position.assetType,
+    tipo: position.assetType ?? 'OUTROS',
     ticker: position.ticker,
   }));
 }
@@ -127,8 +129,11 @@ export async function createWallet(name: string): Promise<WalletResponse> {
   return response.json() as Promise<WalletResponse>;
 }
 
-export async function getWallets(): Promise<WalletResponse[]> {
-  const response = await fetch(`${API_BASE_URL}/wallet/all`);
+export async function getWallets(
+  signal?: AbortSignal,
+): Promise<WalletResponse[]> {
+  // /wallet/all returns names only; selection and imports require real IDs.
+  const response = await fetch(`${API_BASE_URL}/wallet`, { signal });
 
   if (!response.ok) {
     throw new Error('Não foi possível carregar as carteiras.');

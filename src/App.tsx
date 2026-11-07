@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   getWalletAssets,
   getWalletBasicInfo,
+  getWallets,
   refreshWalletBasicInfo,
   setAssetPriceScheduler,
 } from './api/wallet';
@@ -20,6 +21,7 @@ import type {
   AssetClass,
   WalletAsset,
   WalletBasicInfo,
+  WalletResponse,
 } from './types/portfolio';
 import { AssetPriceSchedulerAction } from './types/scheduler';
 import './App.css';
@@ -60,42 +62,111 @@ function App() {
   const [isDarkTheme, setIsDarkTheme] = useState(false);
   const [isViewingEquities, setIsViewingEquities] = useState(false);
   const [selectedAssetName, setSelectedAssetName] = useState('Ações');
-  const [walletId, setWalletId] = useState(1);
-  const [walletName, setWalletName] = useState('Minha carteira');
+  const [selectedWallet, setSelectedWallet] = useState<WalletResponse | null>(
+    null,
+  );
+  const walletId = selectedWallet?.id ?? null;
+  const walletName = selectedWallet?.name ?? 'Nenhuma carteira selecionada';
+  const [wallets, setWallets] = useState<WalletResponse[]>([]);
+  const [isLoadingWallets, setIsLoadingWallets] = useState(true);
+  const [walletsError, setWalletsError] = useState<string | null>(null);
+  const [walletListAttempt, setWalletListAttempt] = useState(0);
   const [walletInfo, setWalletInfo] = useState<WalletBasicInfo | null>(null);
   const [walletAssets, setWalletAssets] = useState<WalletAsset[] | null>(null);
   const [walletInfoError, setWalletInfoError] = useState<string | null>(null);
+  const [walletAssetsError, setWalletAssetsError] = useState<string | null>(
+    null,
+  );
+  const [synchronizationError, setSynchronizationError] = useState<
+    string | null
+  >(null);
+  const request = useRef({
+    version: 0,
+    controller: null as AbortController | null,
+  });
+  const activeWalletId = useRef<number | null>(null);
   const [isWalletRefreshing, setIsWalletRefreshing] = useState(true);
   const [isSynchronizationEnabled, setIsSynchronizationEnabled] =
     useState(true);
   const [isSynchronizationUpdating, setIsSynchronizationUpdating] =
     useState(false);
 
+  const selectWallet = useCallback((wallet: WalletResponse) => {
+    activeWalletId.current = wallet.id;
+    request.current.version += 1;
+    request.current.controller?.abort();
+    setSelectedWallet(wallet);
+    setWalletInfo(null);
+    setWalletAssets(null);
+    setWalletInfoError(null);
+    setWalletAssetsError(null);
+    setSelectedClass(null);
+    setIsWalletRefreshing(true);
+    setActiveItem('Visão geral');
+    setIsViewingEquities(false);
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    let active = true;
+    getWallets(controller.signal)
+      .then(available => {
+        if (!active) return;
+        setWallets(available);
+        if (available.length > 0) selectWallet(available[0]);
+      })
+      .catch(() => {
+        if (active) setWalletsError('Não foi possível carregar as carteiras.');
+      })
+      .finally(() => {
+        if (active) setIsLoadingWallets(false);
+      });
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [walletListAttempt, selectWallet]);
+
   const refreshWalletInfo = useCallback(
     async (shouldUpdate = false) => {
+      if (walletId === null || walletId !== activeWalletId.current) return;
+      request.current.controller?.abort();
+      const controller = new AbortController();
+      const version = ++request.current.version;
+      request.current.controller = controller;
       setIsWalletRefreshing(true);
-      setWalletInfoError(null);
 
-      try {
-        const [basicInfo, assets] = await Promise.all([
-          shouldUpdate
-            ? refreshWalletBasicInfo(walletId)
-            : getWalletBasicInfo(walletId),
-          getWalletAssets(walletId),
-        ]);
+      const [basicInfo, assets] = await Promise.allSettled([
+        shouldUpdate
+          ? refreshWalletBasicInfo(walletId, controller.signal)
+          : getWalletBasicInfo(walletId, controller.signal),
+        getWalletAssets(walletId, controller.signal),
+      ]);
+      // Abort alone is not enough: a response may already have completed.
+      if (version !== request.current.version || controller.signal.aborted)
+        return;
 
-        setWalletInfo(basicInfo);
-        setWalletAssets(assets);
-      } catch {
+      if (basicInfo.status === 'fulfilled') {
+        setWalletInfo(basicInfo.value);
+        setWalletInfoError(null);
+      } else {
         setWalletInfoError('Não foi possível carregar os dados da carteira.');
-      } finally {
-        setIsWalletRefreshing(false);
       }
+      if (assets.status === 'fulfilled') {
+        setWalletAssets(assets.value);
+        setWalletAssetsError(null);
+      } else {
+        setWalletAssetsError(
+          'Não foi possível atualizar os ativos. A contagem por classe pode estar desatualizada ou indisponível.',
+        );
+      }
+      setIsWalletRefreshing(false);
     },
     [walletId],
   );
 
   useEffect(() => {
+    const currentRequest = request.current;
     const initialRefreshId = window.setTimeout(() => {
       void refreshWalletInfo();
     }, 0);
@@ -109,6 +180,8 @@ function App() {
     return () => {
       window.clearTimeout(initialRefreshId);
       window.clearInterval(intervalId);
+      currentRequest.version += 1;
+      currentRequest.controller?.abort();
     };
   }, [refreshWalletInfo]);
 
@@ -119,12 +192,13 @@ function App() {
       : AssetPriceSchedulerAction.Deactivate;
 
     setIsSynchronizationUpdating(true);
+    setSynchronizationError(null);
 
     try {
       await setAssetPriceScheduler(action);
       setIsSynchronizationEnabled(nextState);
     } catch {
-      setWalletInfoError(
+      setSynchronizationError(
         'Não foi possível alterar a sincronização automática.',
       );
     } finally {
@@ -151,17 +225,50 @@ function App() {
         activeItem={activeItem}
         isExpanded={isSidebarExpanded}
         onWalletCreated={wallet => {
-          setWalletId(wallet.id);
-          setWalletName(wallet.name);
-          setActiveItem('Visão geral');
+          setWallets(current => [...current, wallet]);
+          selectWallet(wallet);
         }}
+        onWalletSelected={wallet => {
+          if (wallet.id !== walletId) selectWallet(wallet);
+        }}
+        onRetryWallets={() => {
+          setIsLoadingWallets(true);
+          setWalletsError(null);
+          setWalletListAttempt(attempt => attempt + 1);
+        }}
+        wallets={wallets}
+        walletsError={walletsError}
+        isLoadingWallets={isLoadingWallets}
         onNavigate={handleNavigate}
         onToggle={() => setIsSidebarExpanded(expanded => !expanded)}
         walletId={walletId}
         walletName={walletName}
       />
       <main className="dashboard">
-        {activeItem === 'Importação' ? (
+        {walletInfoError && (
+          <p className="dashboard__status" role="alert">
+            {walletInfoError}
+          </p>
+        )}
+        {walletAssetsError && (
+          <p className="dashboard__status" role="alert">
+            {walletAssetsError}
+          </p>
+        )}
+        {synchronizationError && (
+          <p className="dashboard__status" role="alert">
+            {synchronizationError}
+          </p>
+        )}
+        {walletId === null ? (
+          <p className="dashboard__status" role="status">
+            {isLoadingWallets
+              ? 'Carregando carteiras...'
+              : walletsError
+                ? 'A lista de carteiras está indisponível. Tente novamente.'
+                : 'Nenhuma carteira cadastrada. Crie uma carteira no menu lateral para começar.'}
+          </p>
+        ) : activeItem === 'Importação' ? (
           <ImportTransactions
             key={walletId}
             walletId={walletId}
@@ -194,7 +301,7 @@ function App() {
               onSynchronizationToggle={() => void handleSynchronizationToggle()}
               onThemeToggle={() => setIsDarkTheme(isDark => !isDark)}
             />
-            {isWalletRefreshing ? (
+            {isWalletRefreshing && !walletInfo ? (
               <DashboardSkeleton />
             ) : walletInfo ? (
               <>
@@ -214,11 +321,11 @@ function App() {
                   onSelect={setSelectedClass}
                 />
               </>
-            ) : (
+            ) : !walletInfoError ? (
               <p className="dashboard__status" role="status">
-                {walletInfoError ?? 'Carregando informações da carteira...'}
+                Carregando informações da carteira...
               </p>
-            )}
+            ) : null}
           </>
         )}
       </main>
