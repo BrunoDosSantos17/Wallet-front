@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
+import { getCurrencyQuote } from '../../api/wallet';
 import { portfolioOverview } from '../../data/dashboard';
-import type { PortfolioAsset } from '../../types/portfolio';
+import type { CurrencyQuote, PortfolioAsset } from '../../types/portfolio';
 import { formatCurrency } from '../../utils/formatters';
 import './Portfolio.css';
 
@@ -64,6 +66,23 @@ function AssetRow({ asset, largestPercentage, onOpenAsset }: AssetRowProps) {
 }
 
 export function Portfolio({ onBack, onOpenAsset }: PortfolioProps) {
+  const [dollarQuote, setDollarQuote] = useState<CurrencyQuote | null>(null);
+  const [dollarQuoteError, setDollarQuoteError] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    getCurrencyQuote('USD-BRL', controller.signal)
+      .then(setDollarQuote)
+      .catch(error => {
+        if (error.name !== 'AbortError') {
+          setDollarQuoteError(true);
+        }
+      });
+
+    return () => controller.abort();
+  }, []);
+
   const largestPercentage = Math.max(
     ...portfolioOverview.assets.map(asset => asset.percentage),
   );
@@ -96,9 +115,13 @@ export function Portfolio({ onBack, onOpenAsset }: PortfolioProps) {
           <small>{portfolioOverview.assetClassHint}</small>
         </article>
         <article>
-          <span>DÓLAR</span>
-          <strong>{formatCurrency(portfolioOverview.dollarQuote)}</strong>
-          <small>Cotação comercial</small>
+          <span>DÓLAR · USD → BRL</span>
+          <strong>
+            {dollarQuote ? formatCurrency(dollarQuote.bid) : 'Carregando...'}
+          </strong>
+          <small>
+            {dollarQuoteError ? 'Cotação indisponível' : 'Cotação comercial'}
+          </small>
         </article>
       </section>
 

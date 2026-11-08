@@ -1,10 +1,21 @@
+import { useState } from 'react';
+import { createWallet } from '../../api/wallet';
+import type { WalletResponse } from '../../types/portfolio';
 import './Sidebar.css';
 
 interface SidebarProps {
   activeItem: string;
   isExpanded: boolean;
+  onWalletCreated: (wallet: WalletResponse) => void;
+  onWalletSelected: (wallet: WalletResponse) => void;
+  onRetryWallets: () => void;
+  wallets: WalletResponse[];
+  isLoadingWallets: boolean;
+  walletsError: string | null;
   onNavigate: (item: string) => void;
   onToggle: () => void;
+  walletId: number | null;
+  walletName: string;
 }
 
 const navigation = [
@@ -17,9 +28,50 @@ const navigation = [
 export function Sidebar({
   activeItem,
   isExpanded,
+  onWalletCreated,
+  onWalletSelected,
+  onRetryWallets,
+  wallets,
+  isLoadingWallets,
+  walletsError,
   onNavigate,
   onToggle,
+  walletId,
+  walletName,
 }: SidebarProps) {
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
+  const [isCreatingWallet, setIsCreatingWallet] = useState(false);
+  const [newWalletName, setNewWalletName] = useState('');
+  const [walletError, setWalletError] = useState<string | null>(null);
+  const [isSubmittingWallet, setIsSubmittingWallet] = useState(false);
+
+  const activeWalletName =
+    wallets.find(wallet => wallet.id === walletId)?.name ?? walletName;
+
+  async function handleCreateWallet() {
+    if (isSubmittingWallet) return;
+    const name = newWalletName.trim();
+
+    if (!name) {
+      setWalletError('Informe o nome da carteira.');
+      return;
+    }
+
+    setIsSubmittingWallet(true);
+    setWalletError(null);
+
+    try {
+      const wallet = await createWallet(name);
+      onWalletCreated(wallet);
+      setNewWalletName('');
+      setIsCreatingWallet(false);
+    } catch {
+      setWalletError('Não foi possível criar a carteira.');
+    } finally {
+      setIsSubmittingWallet(false);
+    }
+  }
+
   return (
     <aside className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`}>
       <button
@@ -35,16 +87,110 @@ export function Sidebar({
           <i />
         </span>
       </button>
+      {walletsError && (
+        <div className="sidebar__wallet-status" role="alert">
+          {walletsError}
+          <button
+            type="button"
+            disabled={isLoadingWallets}
+            onClick={onRetryWallets}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
       <p className="sidebar__portfolio-label">
         MINHA CARTEIRA
         <br />
         Patrimônio em foco
       </p>
-      <button className="portfolio-switcher" type="button">
+      <button
+        aria-expanded={isWalletMenuOpen}
+        className="portfolio-switcher"
+        onClick={() => {
+          setWalletError(null);
+          setIsWalletMenuOpen(open => !open);
+          setIsCreatingWallet(false);
+        }}
+        type="button"
+      >
         <span>⇄</span>
-        <span>Minha carteira</span>
+        <span>{activeWalletName}</span>
         <span aria-hidden="true">⌄</span>
       </button>
+      {isWalletMenuOpen && (
+        <div className="sidebar__wallet-creation">
+          <button
+            className="sidebar__new-wallet"
+            disabled={isLoadingWallets}
+            onClick={() => {
+              setIsCreatingWallet(visible => !visible);
+              setWalletError(null);
+            }}
+            type="button"
+          >
+            <span aria-hidden="true">+</span> Nova carteira
+          </button>
+          {isCreatingWallet && (
+            <form
+              className="sidebar__wallet-form"
+              onSubmit={event => {
+                event.preventDefault();
+                void handleCreateWallet();
+              }}
+            >
+              <label htmlFor="wallet-name">NOME DA CARTEIRA</label>
+              <div>
+                <input
+                  autoFocus
+                  disabled={isSubmittingWallet}
+                  id="wallet-name"
+                  onChange={event => setNewWalletName(event.target.value)}
+                  placeholder="Ex.: Reserva de viagem"
+                  value={newWalletName}
+                />
+                <button
+                  aria-label="Criar carteira"
+                  disabled={isSubmittingWallet}
+                  type="submit"
+                >
+                  →
+                </button>
+              </div>
+              {walletError && <small role="alert">{walletError}</small>}
+            </form>
+          )}
+          {isLoadingWallets ? (
+            <small className="sidebar__wallet-status">
+              Carregando carteiras...
+            </small>
+          ) : (
+            <div className="sidebar__wallet-list">
+              {wallets.length === 0 && !walletsError && (
+                <small>Nenhuma carteira cadastrada.</small>
+              )}
+              {wallets.map(wallet => (
+                <button
+                  className={
+                    wallet.id === walletId ? 'sidebar__wallet--active' : ''
+                  }
+                  key={wallet.id}
+                  onClick={() => onWalletSelected(wallet)}
+                  type="button"
+                >
+                  <i aria-hidden="true" />
+                  {wallet.name}
+                </button>
+              ))}
+            </div>
+          )}
+          {walletError && !isCreatingWallet && (
+            <small className="sidebar__wallet-status" role="alert">
+              {walletError}
+            </small>
+          )}
+        </div>
+      )}
       <nav className="sidebar__nav" aria-label="Navegação principal">
         {navigation.map(item => (
           <button
