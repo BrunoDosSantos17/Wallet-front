@@ -3,6 +3,7 @@ import { importWalletTransactions } from '../../api/wallet';
 import type { ImportResponse } from '../../types/portfolio';
 import { ImportTransactionsSkeleton } from './ImportTransactionsSkeleton';
 import './ImportTransactions.css';
+import { AlertCard } from '../AlertCards/AlertCards';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = ['xlsx', 'xls'];
@@ -90,7 +91,9 @@ export function ImportTransactions({
         <span>MOVIMENTAÇÕES / IMPORTAR</span>
         <h1 id="import-title">Importe suas movimentações</h1>
         <p>Envie uma planilha e mantenha sua carteira sempre atualizada.</p>
-        <p>Carteira de destino: <strong>{walletName}</strong> (ID {walletId})</p>
+        <p>
+          Carteira de destino: <strong>{walletName}</strong> (ID {walletId})
+        </p>
       </header>
 
       <input
@@ -145,9 +148,7 @@ export function ImportTransactions({
       </div>
 
       {error && (
-        <p className="import-transactions__message import-transactions__message--error">
-          {error}
-        </p>
+        <AlertCard title="Importação de movimentações">{error}</AlertCard>
       )}
 
       {result && (

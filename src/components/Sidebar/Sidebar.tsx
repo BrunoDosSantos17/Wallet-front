@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { createWallet } from '../../api/wallet';
 import type { WalletResponse } from '../../types/portfolio';
 import './Sidebar.css';
+import { AlertCard } from '../AlertCards/AlertCards';
 
 interface SidebarProps {
   activeItem: string;
@@ -88,7 +89,7 @@ export function Sidebar({
         </span>
       </button>
       {walletsError && (
-        <div className="sidebar__wallet-status" role="alert">
+        <AlertCard title="Lista de carteiras">
           {walletsError}
           <button
             type="button"
@@ -97,7 +98,7 @@ export function Sidebar({
           >
             Tentar novamente
           </button>
-        </div>
+        </AlertCard>
       )}
       <p className="sidebar__portfolio-label">
         MINHA CARTEIRA
@@ -157,7 +158,9 @@ export function Sidebar({
                   →
                 </button>
               </div>
-              {walletError && <small role="alert">{walletError}</small>}
+              {walletError && (
+                <AlertCard title="Criação da carteira">{walletError}</AlertCard>
+              )}
             </form>
           )}
           {isLoadingWallets ? (
@@ -185,9 +188,7 @@ export function Sidebar({
             </div>
           )}
           {walletError && !isCreatingWallet && (
-            <small className="sidebar__wallet-status" role="alert">
-              {walletError}
-            </small>
+            <AlertCard title="Criação da carteira">{walletError}</AlertCard>
           )}
         </div>
       )}

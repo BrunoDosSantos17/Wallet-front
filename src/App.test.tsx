@@ -298,6 +298,88 @@ describe('I4 — seleção e carregamento', () => {
     expect(vi.mocked(api.getWalletBasicInfo).mock.calls.at(-1)?.[0]).toBe(12);
   });
 
+  it('C8 não converte patrimônio ausente em gráfico ou total zero', async () => {
+    vi.mocked(api.getWalletBasicInfo).mockResolvedValue({
+      ...summary(),
+      patrimonioTotal: null,
+      rendaMensalEst: null,
+    });
+    render(<App />);
+    await screen.findByRole('region', { name: 'Resumo da carteira' });
+    expect(screen.getAllByText('Indisponível')).toHaveLength(2);
+    expect(screen.getByText(/Distribuição indisponível/)).toBeTruthy();
+    expect(screen.queryByText('Distribuição da carteira')).toBeNull();
+    expect(screen.queryByText('Por classe de ativo')).toBeNull();
+  });
+
+  it('C8 usa contagem de ativos do resumo, sem interpretar unidades fracionárias como contagem', async () => {
+    vi.mocked(api.getWalletBasicInfo).mockResolvedValue({
+      ...summary(),
+      ativosCarteira: 1,
+      distribuicao: [
+        {
+          nomeAtivo: 'STOCK',
+          percentual: '100,00%',
+          valor: '700',
+          quantidade: '0.125',
+          quantidadeAtivos: 1,
+        },
+      ],
+    });
+    render(<App />);
+    await screen.findByRole('region', { name: 'Resumo da carteira' });
+    expect(screen.getByText('1 ativos')).toBeTruthy();
+    expect(screen.queryByText(/0.125 ativos/)).toBeNull();
+    expect(screen.getByText(/Histórico indisponível/)).toBeTruthy();
+  });
+
+  it('alertas ficam abaixo do cabeçalho e não substituem os controles de sincronização', async () => {
+    vi.mocked(api.refreshWalletBasicInfo).mockRejectedValue(new Error('rede'));
+    render(<App />);
+    await screen.findByRole('region', { name: 'Resumo da carteira' });
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Sincronizar dados da carteira' }),
+    );
+    await screen.findByRole('alert');
+    const region = screen.getByLabelText('Alertas');
+    expect(within(region).getByRole('alert').textContent).toContain(
+      'dados da carteira',
+    );
+    const synchronization = screen.getByRole('switch', {
+      name: 'Alternar sincronização automática de ações',
+    });
+    expect(region.contains(synchronization)).toBe(false);
+    expect(
+      synchronization.closest('header')!.compareDocumentPosition(region) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    fireEvent.click(synchronization);
+    await waitFor(() =>
+      expect(api.setAssetPriceScheduler).toHaveBeenCalledOnce(),
+    );
+    expect(
+      (
+        screen.getByRole('button', {
+          name: 'Sincronizar dados da carteira',
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false);
+  });
+
+  it('menu Movimentações abre a tela própria com detalhes inicialmente ausentes', async () => {
+    render(<App />);
+    await screen.findByRole('region', { name: 'Resumo da carteira' });
+    fireEvent.click(screen.getByRole('button', { name: 'Movimentações' }));
+    expect(screen.getByRole('heading', { name: 'Movimentações' })).toBeTruthy();
+    expect(screen.getByText('Prévia de demonstração.')).toBeTruthy();
+    expect(
+      screen.queryByRole('region', { name: 'Visualizar operação' }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('region', { name: 'Resumo da carteira' }),
+    ).toBeNull();
+  });
+
   it('limpa requisições ao desmontar e funciona em StrictMode', async () => {
     const { unmount } = render(
       <StrictMode>

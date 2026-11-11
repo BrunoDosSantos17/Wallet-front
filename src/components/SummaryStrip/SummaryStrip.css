@@ -38,6 +38,30 @@
 .summary-strip__detail--info {
   color: #3d7499;
 }
+.summary-strip__notices {
+  grid-column: 1 / -1;
+  border-top: 1px solid #dce5de;
+  padding: 12px 24px;
+  color: #6b7d72;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.summary-strip__notices p {
+  margin: 0;
+}
+.summary-strip__notices p + p {
+  margin-top: 8px;
+}
+.summary-strip__notices [role='alert'] {
+  color: #b7791f;
+}
+.app-shell--dark .summary-strip__notices {
+  border-color: #2e4538;
+  color: #9ab0a2;
+}
+.app-shell--dark .summary-strip__notices [role='alert'] {
+  color: #f2bc65;
+}
 @media (max-width: 640px) {
   .summary-strip {
     grid-template-columns: 1fr;

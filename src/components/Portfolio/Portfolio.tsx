@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getCurrencyQuote } from '../../api/wallet';
-import { portfolioOverview } from '../../data/dashboard';
+import { demonstrationNotice, portfolioOverview } from '../../data/dashboard';
 import type { CurrencyQuote, PortfolioAsset } from '../../types/portfolio';
 import { formatCurrency } from '../../utils/formatters';
 import './Portfolio.css';
@@ -73,9 +73,14 @@ export function Portfolio({ onBack, onOpenAsset }: PortfolioProps) {
     const controller = new AbortController();
 
     getCurrencyQuote('USD-BRL', controller.signal)
-      .then(setDollarQuote)
-      .catch(error => {
-        if (error.name !== 'AbortError') {
+      .then(quote => {
+        if (controller.signal.aborted) return;
+        if (!Number.isFinite(quote.bid) || quote.bid <= 0)
+          throw new Error('Cotação inválida');
+        setDollarQuote(quote);
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
           setDollarQuoteError(true);
         }
       });
@@ -97,17 +102,18 @@ export function Portfolio({ onBack, onOpenAsset }: PortfolioProps) {
         <h1 id="portfolio-title">Carteira</h1>
         <p>
           {portfolioOverview.assetClassCount} classes de ativos ·{' '}
-          {formatCurrency(portfolioOverview.totalAmount)} investidos
+          {formatCurrency(portfolioOverview.totalAmount)} fictícios
         </p>
       </header>
+      <p className="data-notice" role="note">
+        {demonstrationNotice}
+      </p>
 
       <section className="portfolio__summary" aria-label="Resumo da carteira">
         <article>
-          <span>VALOR TOTAL DA CARTEIRA</span>
+          <span>VALOR TOTAL · DEMONSTRAÇÃO</span>
           <strong>{formatCurrency(portfolioOverview.totalAmount)}</strong>
-          <small className="portfolio__positive">
-            {portfolioOverview.annualChange}
-          </small>
+          <small>Rentabilidade indisponível</small>
         </article>
         <article>
           <span>CLASSES DE ATIVOS</span>
@@ -117,10 +123,16 @@ export function Portfolio({ onBack, onOpenAsset }: PortfolioProps) {
         <article>
           <span>DÓLAR · USD → BRL</span>
           <strong>
-            {dollarQuote ? formatCurrency(dollarQuote.bid) : 'Carregando...'}
+            {dollarQuoteError
+              ? 'Indisponível'
+              : dollarQuote
+                ? formatCurrency(dollarQuote.bid)
+                : 'Carregando...'}
           </strong>
           <small>
-            {dollarQuoteError ? 'Cotação indisponível' : 'Cotação comercial'}
+            {dollarQuoteError
+              ? 'Cotação indisponível; sem valor de demonstração como fallback'
+              : 'Cotação consultada na API; não compõe os valores fictícios'}
           </small>
         </article>
       </section>

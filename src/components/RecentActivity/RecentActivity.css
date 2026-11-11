@@ -1,6 +1,15 @@
 .recent-activity {
   padding: 24px;
 }
+.recent-activity [role='status'] {
+  color: #6b7d72;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-top: 18px;
+}
+.app-shell--dark .recent-activity [role='status'] {
+  color: #9ab0a2;
+}
 .recent-activity__list {
   display: grid;
   gap: 18px;
