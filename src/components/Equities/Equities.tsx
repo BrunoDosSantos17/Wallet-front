@@ -1,4 +1,4 @@
-import { equitiesOverview } from '../../data/dashboard';
+import { demonstrationNotice, equitiesOverview } from '../../data/dashboard';
 import { formatCurrency } from '../../utils/formatters';
 import './Equities.css';
 
@@ -16,12 +16,15 @@ export function Equities({ onBack, title }: EquitiesProps) {
 
       <header className="equities__heading">
         <h1 id="equities-title">{title}</h1>
-        <p>Acompanhe os ativos de renda variável da sua carteira.</p>
+        <p>Exemplos ilustrativos de posições de renda variável.</p>
       </header>
+      <p className="data-notice" role="note">
+        {demonstrationNotice}
+      </p>
 
       <section className="equities__summary" aria-label="Resumo das ações">
         <article>
-          <span>VALOR TOTAL EM AÇÕES</span>
+          <span>VALOR TOTAL EM AÇÕES · DEMONSTRAÇÃO</span>
           <strong>{formatCurrency(equitiesOverview.totalAmount)}</strong>
         </article>
         <article>
@@ -51,7 +54,12 @@ export function Equities({ onBack, title }: EquitiesProps) {
             </article>
           ))}
         </div>
-        <button className="equities__more" type="button">
+        <button
+          className="equities__more"
+          type="button"
+          disabled
+          title="Lista de demonstração; posições reais dependem da integração"
+        >
           Mostrar mais ações
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path d="m6 9 6 6 6-6" />

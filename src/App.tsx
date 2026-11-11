@@ -16,6 +16,7 @@ import { PortfolioAllocation } from './components/PortfolioAllocation/PortfolioA
 import { RecentActivity } from './components/RecentActivity/RecentActivity';
 import { Sidebar } from './components/Sidebar/Sidebar';
 import { SummaryStrip } from './components/SummaryStrip/SummaryStrip';
+import { Transactions } from './components/Transactions/Transactions';
 import type {
   Allocation,
   AssetClass,
@@ -25,6 +26,11 @@ import type {
 } from './types/portfolio';
 import { AssetPriceSchedulerAction } from './types/scheduler';
 import './App.css';
+import {
+  AlertCard,
+  AlertProvider,
+  AlertRegion,
+} from './components/AlertCards/AlertCards';
 
 const allocationColors = ['#4b8f6a', '#cc942e', '#4e789e', '#b76d6d'];
 
@@ -48,9 +54,11 @@ function toAllocation(
     percentage: Number(
       distribution.percentual.replace('%', '').replace(',', '.'),
     ),
-    assetCount: assets
-      ? countDistinctAssetsByType(assets, distribution.nomeAtivo)
-      : null,
+    assetCount:
+      distribution.quantidadeAtivos ??
+      (assets
+        ? countDistinctAssetsByType(assets, distribution.nomeAtivo)
+        : null),
     color: allocationColors[index % allocationColors.length],
   };
 }
@@ -218,80 +226,42 @@ function App() {
     walletInfo?.distribuicao.map((distribution, index) =>
       toAllocation(distribution, index, walletAssets ?? undefined),
     ) ?? [];
+  const hasPatrimony =
+    typeof walletInfo?.patrimonioTotal === 'number' &&
+    Number.isFinite(walletInfo.patrimonioTotal);
+
+  const isOverview = !['Importação', 'Movimentações', 'Carteira'].includes(
+    activeItem,
+  );
 
   return (
-    <div className={`app-shell ${isDarkTheme ? 'app-shell--dark' : ''}`}>
-      <Sidebar
-        activeItem={activeItem}
-        isExpanded={isSidebarExpanded}
-        onWalletCreated={wallet => {
-          setWallets(current => [...current, wallet]);
-          selectWallet(wallet);
-        }}
-        onWalletSelected={wallet => {
-          if (wallet.id !== walletId) selectWallet(wallet);
-        }}
-        onRetryWallets={() => {
-          setIsLoadingWallets(true);
-          setWalletsError(null);
-          setWalletListAttempt(attempt => attempt + 1);
-        }}
-        wallets={wallets}
-        walletsError={walletsError}
-        isLoadingWallets={isLoadingWallets}
-        onNavigate={handleNavigate}
-        onToggle={() => setIsSidebarExpanded(expanded => !expanded)}
-        walletId={walletId}
-        walletName={walletName}
-      />
-      <main className="dashboard">
-        {walletInfoError && (
-          <p className="dashboard__status" role="alert">
-            {walletInfoError}
-          </p>
-        )}
-        {walletAssetsError && (
-          <p className="dashboard__status" role="alert">
-            {walletAssetsError}
-          </p>
-        )}
-        {synchronizationError && (
-          <p className="dashboard__status" role="alert">
-            {synchronizationError}
-          </p>
-        )}
-        {walletId === null ? (
-          <p className="dashboard__status" role="status">
-            {isLoadingWallets
-              ? 'Carregando carteiras...'
-              : walletsError
-                ? 'A lista de carteiras está indisponível. Tente novamente.'
-                : 'Nenhuma carteira cadastrada. Crie uma carteira no menu lateral para começar.'}
-          </p>
-        ) : activeItem === 'Importação' ? (
-          <ImportTransactions
-            key={walletId}
-            walletId={walletId}
-            walletName={walletName}
-            onComplete={() => void refreshWalletInfo()}
-          />
-        ) : activeItem === 'Carteira' ? (
-          isViewingEquities ? (
-            <Equities
-              onBack={() => setIsViewingEquities(false)}
-              title={selectedAssetName}
-            />
-          ) : (
-            <Portfolio
-              onBack={() => setActiveItem('Visão geral')}
-              onOpenAsset={name => {
-                setSelectedAssetName(name);
-                setIsViewingEquities(true);
-              }}
-            />
-          )
-        ) : (
-          <>
+    <AlertProvider>
+      <div className={`app-shell ${isDarkTheme ? 'app-shell--dark' : ''}`}>
+        <Sidebar
+          activeItem={activeItem}
+          isExpanded={isSidebarExpanded}
+          onWalletCreated={wallet => {
+            setWallets(current => [...current, wallet]);
+            selectWallet(wallet);
+          }}
+          onWalletSelected={wallet => {
+            if (wallet.id !== walletId) selectWallet(wallet);
+          }}
+          onRetryWallets={() => {
+            setIsLoadingWallets(true);
+            setWalletsError(null);
+            setWalletListAttempt(attempt => attempt + 1);
+          }}
+          wallets={wallets}
+          walletsError={walletsError}
+          isLoadingWallets={isLoadingWallets}
+          onNavigate={handleNavigate}
+          onToggle={() => setIsSidebarExpanded(expanded => !expanded)}
+          walletId={walletId}
+          walletName={walletName}
+        />
+        <main className="dashboard">
+          {walletId !== null && isOverview && (
             <PageHeader
               isDarkTheme={isDarkTheme}
               isRefreshing={isWalletRefreshing}
@@ -301,35 +271,95 @@ function App() {
               onSynchronizationToggle={() => void handleSynchronizationToggle()}
               onThemeToggle={() => setIsDarkTheme(isDark => !isDark)}
             />
-            {isWalletRefreshing && !walletInfo ? (
-              <DashboardSkeleton />
-            ) : walletInfo ? (
-              <>
-                <SummaryStrip walletInfo={walletInfo} />
-                <div className="dashboard__top">
-                  <PortfolioAllocation
-                    allocations={allocations}
-                    selectedClass={selectedClass}
-                    onSelect={setSelectedClass}
-                    totalAmount={walletInfo.patrimonioTotal}
-                  />
-                  <RecentActivity />
-                </div>
-                <HoldingsPreview
-                  allocations={allocations}
-                  selectedClass={selectedClass}
-                  onSelect={setSelectedClass}
-                />
-              </>
-            ) : !walletInfoError ? (
-              <p className="dashboard__status" role="status">
-                Carregando informações da carteira...
-              </p>
-            ) : null}
-          </>
-        )}
-      </main>
-    </div>
+          )}
+          <AlertRegion />
+          {walletInfoError && (
+            <AlertCard title="Dados da carteira">{walletInfoError}</AlertCard>
+          )}
+          {walletAssetsError && (
+            <AlertCard title="Ativos da carteira">
+              {walletAssetsError}
+            </AlertCard>
+          )}
+          {synchronizationError && (
+            <AlertCard title="Sincronização">{synchronizationError}</AlertCard>
+          )}
+          {walletId === null ? (
+            <p className="dashboard__status" role="status">
+              {isLoadingWallets
+                ? 'Carregando carteiras...'
+                : walletsError
+                  ? 'A lista de carteiras está indisponível. Tente novamente.'
+                  : 'Nenhuma carteira cadastrada. Crie uma carteira no menu lateral para começar.'}
+            </p>
+          ) : activeItem === 'Importação' ? (
+            <ImportTransactions
+              key={walletId}
+              walletId={walletId}
+              walletName={walletName}
+              onComplete={() => void refreshWalletInfo()}
+            />
+          ) : activeItem === 'Movimentações' ? (
+            <Transactions
+              key={walletId}
+              onBack={() => handleNavigate('Carteira')}
+            />
+          ) : activeItem === 'Carteira' ? (
+            isViewingEquities ? (
+              <Equities
+                onBack={() => setIsViewingEquities(false)}
+                title={selectedAssetName}
+              />
+            ) : (
+              <Portfolio
+                onBack={() => setActiveItem('Visão geral')}
+                onOpenAsset={name => {
+                  setSelectedAssetName(name);
+                  setIsViewingEquities(true);
+                }}
+              />
+            )
+          ) : (
+            <>
+              {isWalletRefreshing && !walletInfo ? (
+                <DashboardSkeleton />
+              ) : walletInfo ? (
+                <>
+                  <SummaryStrip walletInfo={walletInfo} />
+                  <div className="dashboard__top">
+                    {hasPatrimony ? (
+                      <PortfolioAllocation
+                        allocations={allocations}
+                        selectedClass={selectedClass}
+                        onSelect={setSelectedClass}
+                        totalAmount={walletInfo.patrimonioTotal}
+                      />
+                    ) : (
+                      <p className="dashboard__status" role="status">
+                        Distribuição indisponível: valor de mercado não
+                        informado.
+                      </p>
+                    )}
+                    <RecentActivity />
+                  </div>
+                  {hasPatrimony && (
+                    <HoldingsPreview
+                      allocations={allocations}
+                      selectedClass={selectedClass}
+                      onSelect={setSelectedClass}
+                    />
+                  )}
+                </>
+              ) : !walletInfoError ? (
+                <p className="dashboard__status" role="status">
+                  Carregando informações da carteira...
+                </p>
+              ) : null}
+            </>
+          )}
+        </main>
+      </div>
+    </AlertProvider>
   );
 }
 

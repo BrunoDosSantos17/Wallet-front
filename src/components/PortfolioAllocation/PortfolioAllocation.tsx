@@ -6,7 +6,7 @@ interface PortfolioAllocationProps {
   allocations: Allocation[];
   selectedClass: AssetClass | null;
   onSelect: (assetClass: AssetClass) => void;
-  totalAmount: number;
+  totalAmount: number | null;
 }
 
 export function PortfolioAllocation({
@@ -32,8 +32,12 @@ export function PortfolioAllocation({
       <div className="allocation__content">
         <div className="allocation__chart" style={{ background: gradient }}>
           <div>
-            <strong>{formatCurrency(totalAmount)}</strong>
-            <span>investidos</span>
+            <strong>
+              {typeof totalAmount === 'number' && Number.isFinite(totalAmount)
+                ? formatCurrency(totalAmount)
+                : 'Indisponível'}
+            </strong>
+            <span>valor de mercado informado</span>
           </div>
         </div>
         <div className="allocation__legend">

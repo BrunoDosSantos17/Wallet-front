@@ -1,0 +1,131 @@
+.alert-cards {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  margin: 20px 0;
+  min-width: 0;
+  overflow-x: clip;
+}
+.alert-cards:empty {
+  display: none;
+}
+.alert-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 380px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #eed3ce;
+  border-left: 4px solid #bd4b3d;
+  border-radius: 12px;
+  background: #fffaf9;
+  color: #71372e;
+  box-shadow: 0 4px 14px #1630240a;
+  text-align: left;
+  overflow-wrap: anywhere;
+  animation: alert-card-enter 250ms ease-out both;
+}
+.alert-card--leaving {
+  animation: alert-card-exit 300ms ease-in both;
+  pointer-events: none;
+}
+@keyframes alert-card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes alert-card-exit {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .alert-card,
+  .alert-card--leaving {
+    animation: none;
+  }
+  .alert-card--leaving {
+    visibility: hidden;
+  }
+}
+.alert-card--warning {
+  background: #fffcf3;
+  border-color: #eadbb0;
+  border-left-color: #b7791f;
+  color: #795515;
+}
+.alert-card__icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  height: 22px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 700;
+}
+.alert-card__content {
+  min-width: 0;
+}
+.alert-card__title {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.alert-card__message {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.alert-card__message p {
+  margin: 0;
+}
+.alert-card__message button {
+  display: block;
+  margin-top: 10px;
+  padding: 7px 10px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.alert-card__message button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.alert-card__message button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+.app-shell--dark .alert-card {
+  background: #30221f;
+  border-color: #6a433b;
+  border-left-color: #ef998b;
+  color: #f2b2a7;
+}
+.app-shell--dark .alert-card--warning {
+  background: #302a1b;
+  border-color: #665433;
+  border-left-color: #efbf69;
+  color: #efcf91;
+}
+@media (max-width: 520px) {
+  .alert-card {
+    width: 100%;
+  }
+}

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import './PageHeader.css';
 
 interface PageHeaderProps {
@@ -19,10 +20,25 @@ export function PageHeader({
   onSynchronizationToggle,
   onThemeToggle,
 }: PageHeaderProps) {
+  const [today, setToday] = useState(() => new Date());
+  useEffect(() => {
+    const interval = window.setInterval(() => setToday(new Date()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
+  const dateLabel = new Intl.DateTimeFormat('pt-BR', {
+    weekday: 'long',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'America/Sao_Paulo',
+  }).format(today);
   return (
     <header className="page-header">
       <div>
-        <span>QUARTA-FEIRA, 12 JUN 2024</span>
+        <span>
+          Hoje · <time dateTime={today.toISOString()}>{dateLabel}</time> · não
+          indica a data das cotações
+        </span>
         <h1>Visão geral</h1>
         <p>Uma leitura simples de onde seu dinheiro está trabalhando.</p>
       </div>

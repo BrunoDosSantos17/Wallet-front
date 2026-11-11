@@ -13,7 +13,8 @@ export interface WalletDistribution {
   nomeAtivo: string;
   percentual: string;
   valor: string;
-  quantidade: number;
+  quantidade: string;
+  quantidadeAtivos: number;
 }
 
 export interface WalletAsset {
@@ -22,10 +23,13 @@ export interface WalletAsset {
 }
 
 export interface WalletBasicInfo {
-  patrimonioTotal: number;
-  rendaMensalEst: number;
+  // The current backend may also return zero for missing data; zero is not proof
+  // of completeness. Null/absent values must never be formatted as money.
+  patrimonioTotal: number | null;
+  rendaMensalEst: number | null;
   ativosCarteira: number;
   distribuicao: WalletDistribution[];
+  avisos?: string[];
   ativos?: WalletAsset[];
 }
 

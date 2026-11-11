@@ -6,6 +6,10 @@ import type {
   Transaction,
 } from '../types/portfolio';
 
+// Design fixtures only. Never use as a fallback for an unavailable API response.
+export const demonstrationNotice =
+  'Demonstração — valores e posições fictícios, sem vínculo com a carteira selecionada.';
+
 export const summaryMetrics: SummaryMetric[] = [
   {
     label: 'Patrimônio total',
